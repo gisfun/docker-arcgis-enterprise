@@ -1,6 +1,6 @@
 FROM ubuntu-server:latest
 LABEL maintainer="brian@wildsong.biz"
-ENV REFRESHED_AT 2024-03-04
+ENV REFRESHED_AT=2025-08-01
 
 EXPOSE 2443 
 # If you are not using a Docker network to connect containers
@@ -24,7 +24,7 @@ ENV PGDATA ${HOME}/data/pgdata
 
 # Put this on its own mountpoint
 ENV DS_DATADIR /srv/arcgisdatastore
-RUN mkdir /srv/arcgisdatastore && chown -R arcgis.arcgis /srv/arcgisdatastore
+RUN mkdir /srv/arcgisdatastore && chown -R arcgis:arcgis /srv/arcgisdatastore
 VOLUME [ "/srv/arcgisdatastore" ]
 
 # Perhaps if I can set this?
@@ -34,7 +34,7 @@ VOLUME [ "/srv/arcgisdatastore" ]
 ADD create_new_site.py .
 
 ADD bashrc .
-ADD start.sh start.sh
+ADD start.sh .
 
 # Drop root privileges.
 USER arcgis

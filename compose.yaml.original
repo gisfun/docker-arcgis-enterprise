@@ -60,7 +60,7 @@ services:
     environment:
       - ESRI_VERSION=${ESRI_VERSION}
       - AGP_USERNAME=${USERNAME}
-      - AGP_PASSWORD=${PASSWORD}
+      - AGP_PASSWORD=${PASSWORD} 
       - PORTAL_CONTENT=/srv/content
     ports:
       - "7080:7080"
@@ -75,9 +75,9 @@ services:
       - server
       - datastore
     # Uncomment the next three lines to work in a shell environment for debugging.
-    entrypoint: /bin/bash
-    stdin_open: true
-    tty: true
+#    entrypoint: /bin/bash
+#    stdin_open: true
+#    tty: true
 
   datastore:
     image: arcgis-datastore

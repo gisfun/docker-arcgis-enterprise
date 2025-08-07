@@ -14,7 +14,7 @@ PROPERTIES=".ESRI.properties.${HOSTNAME}.${ESRI_VERSION}"
 # there will only be one.
 # TODO find the current logfile instead
 # amd remove only old logs
-LOGDIR=/home/arcgis/server/usr/logs/SERVER.LOCAL/server/
+LOGDIR="/home/arcgis/server/usr/logs/${HOSTNAME}/server/"
 rm -rf $LOGDIR/*.log $LOGDIR/*.lck
 
 # Has the server been installed yet?
@@ -64,4 +64,5 @@ echo "Try reaching me at ${SERVER_URL}"
 # I don't have a way to start in "no daemon" mode
 # so I need something to run here...
 # Note there are many logs, this is the one for "server"
+touch $LOGDIR/dummy.log
 tail -f $LOGDIR/*log

@@ -34,7 +34,7 @@ VOLUME [ "/srv/arcgisdatastore" ]
 ADD create_new_site.py .
 
 ADD bashrc .
-ADD start.sh start.sh
+ADD start.sh .
 
 # Drop root privileges.
 USER arcgis

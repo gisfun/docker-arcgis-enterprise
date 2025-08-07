@@ -34,22 +34,15 @@ services:
       - ESRI_VERSION=${ESRI_VERSION}
       - AGS_USERNAME=${USERNAME}
       - AGS_PASSWORD=${PASSWORD}
-      - PORTAL_CONTENT=/srv/content
     ports:
       - "6080:6080"
       - "6443:6443"
-      - "7080:7080"
-      - "7443:7443"
     volumes:
       - ./Installers/ArcGISServer:/app/Installer:ro
       - ./Licenses/server.prvc:/app/server.prvc:ro
       - ./configurebasedeployment.properties:/app/configurebasedeployment.properties:rw
       - server_home:/home/arcgis:rw
       - server_data:/srv/directories:rw
-      - ./Installers/PortalForArcGIS:/app/InstallerPortal:ro
-      - ./Licenses/portal.json:/app/portal_license.json:ro
-#      - portal_home:/home/arcgis:rw
-      - portal_data:/home/arcgis/content:rw
 #      - server_config:/home/arcgis/server/usr/config-store
 #      - server_logs:/home/arcgis/server/usr/logs
     # Uncomment the next three lines to work in a shell environment for debugging. (See exec_server)
@@ -57,30 +50,30 @@ services:
     #stdin_open: true
     #tty: true
 
-  # portal:
-    # image: arcgis-portal
-    # hostname: ${PORTAL}
-    # build:
-      # context: ./portal
-      # dockerfile: Dockerfile
-    # env_file: ./.env
-    # environment:
-      # - ESRI_VERSION=${ESRI_VERSION}
-      # - AGP_USERNAME=${USERNAME}
-      # - AGP_PASSWORD=${PASSWORD} 
-      # - PORTAL_CONTENT=/srv/content
-    # ports:
-      # - "7080:7080"
-      # - "7443:7443"
-    # volumes:
-      # - ./Installers/PortalForArcGIS:/app/Installer:ro
-      # - ./Licenses/portal.json:/app/portal_license.json:ro
-      # - portal_home:/home/arcgis:rw
-      # - portal_data:/home/arcgis/content:rw
-     # #- portal_data:/home/arcgis/portal/usr/arcgisportal:rw
-    # links:
-      # - server
-      # - datastore
+  portal:
+    image: arcgis-portal
+    hostname: ${PORTAL}
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    env_file: ./.env
+    environment:
+      - ESRI_VERSION=${ESRI_VERSION}
+      - AGP_USERNAME=${USERNAME}
+      - AGP_PASSWORD=${PASSWORD} 
+      - PORTAL_CONTENT=/srv/content
+    ports:
+      - "7080:7080"
+      - "7443:7443"
+    volumes:
+      - ./Installers/PortalForArcGIS:/app/Installer:ro
+      - ./Licenses/portal.json:/app/portal_license.json:ro
+      - portal_home:/home/arcgis:rw
+      - portal_data:/home/arcgis/content:rw
+     #- portal_data:/home/arcgis/portal/usr/arcgisportal:rw
+    links:
+      - server
+      - datastore
     # Uncomment the next three lines to work in a shell environment for debugging.
 #    entrypoint: /bin/bash
 #    stdin_open: true

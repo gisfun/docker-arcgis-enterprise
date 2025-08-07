@@ -9,6 +9,12 @@ because it's a fresh install and I have no data needing upgrading.
 I use a Linux Desktop running Linux Mint and a 20 core Intel i9 
 and 64GB of RAM and a 1TB of NVME storage. That probably helps. :-)
 
+## Update
+
+target: 11.5
+combined server and portal into single container
+updated to Ubuntu 24.04, Postgres 16
+
 ## Status
 
 * Server : working

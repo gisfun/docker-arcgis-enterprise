@@ -113,7 +113,7 @@ services:
       dockerfile: Dockerfile.postgres
     ports:
       # Allow access to this database from our LAN
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file: .env

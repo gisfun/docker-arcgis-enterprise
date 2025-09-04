@@ -1,15 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# docker run -it --rm \
-#     --cap-add=NET_ADMIN \
-#     -v "$(pwd)/charles.pem:/tmp/charles.pem:ro" \
+# --------------------------------------------------------------
+# 1) Build the image (once)
+# --------------------------------------------------------------
+docker build -t ubuntu-redsocks .
+
+# --------------------------------------------------------------
+# 2) Run a container with the Charles cert mounted
+# --------------------------------------------------------------
+# docker run -d --name demo \
 #     -e REDSOCKS_PROXY_HOST=host.docker.internal \
-#     -e REDSOCKS_PROXY_PORT=8888 \
-#     my-redsocks \
-#     bash -c '
-#         enable-redsocks.sh on && \
-#         echo ">>> REDSOCKS enabled – try: curl https://example.com" && \
-#         exec bash'
+#     -e REDSOCKS_PROXY_PORT=8889 \
+#     -e REDSOCKS_PROXY_TYPE=socks5 \
+#     -v "$(pwd)/charles.pem:/tmp/charles.pem:ro" \
+#     ubuntu-redsocks sleep infinity
 
 docker stop demo
 docker rm demo
@@ -21,22 +26,20 @@ docker run -d --name demo \
     -e REDSOCKS_PROXY_PORT=8889 \
     -e REDSOCKS_PROXY_TYPE=socks5 \
     -v "$(pwd)/charles.pem:/tmp/charles.pem:ro" \
-    ubuntu-redsocks sleep infinity
+    ubuntu-redsocks
+#    ubuntu-redsocks sleep infinity
 
-#     -v "$(pwd)/charles.pem:/tmp/charles.pem:ro" \
-
-#docker exec demo toggle-redsocks.sh enable
-
-
-# Inside the container
-#docker exec demo curl -s https://ifconfig.me
-# → The IP you see should be the public IP of the host (i.e. the
-#   IP that Charles uses to reach the internet).
-
-# A request that Charles will actually decrypt:
-#docker exec demo curl -k https://www.google.com > /dev/null
-# Open Charles → you will see the request under “SSL Proxying”.
-
+# --------------------------------------------------------------
+# 3) Enable forwarding
+# --------------------------------------------------------------
+docker exec demo toggle-redsocks.sh enable
+echo "Wait for 2 seconds.."
+sleep 2
+# --------------------------------------------------------------
+# 4) Verify that traffic goes through Charles (HTTPS example)
+# --------------------------------------------------------------
+docker exec demo curl -k https://www.google.com > /dev/null
+echo "Check Charles UI – you should see the decrypted Google request."
 
 
 # prompts

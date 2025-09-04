@@ -1,8 +1,11 @@
+/* -------------------------------------------------------------
+   Global options
+   ------------------------------------------------------------- */
 base {
-    log_info = on;
-    log = "stderr";
-    daemon = off;
-    redirector = iptables;
+    log_info   = on;          /* write informational messages */
+    log        = "stderr";    /* where to send the log output */
+    daemon     = off;         /* we run it in the foreground (the entrypoint will background it) */
+    redirector = iptables;    /* use iptables for NAT */
 }
 
 /* -------------------------------------------------------------
@@ -10,9 +13,12 @@ base {
    address/port and forward them to the remote proxy.
    ------------------------------------------------------------- */
 redsocks {
-    local_ip = "127.0.0.1";
-    local_port = 12345;           # <- hard‑coded, used by iptables rules
-    ip = "{{PROXY_HOST}}";
-    port = {{PROXY_PORT}};
-    type = {{PROXY_TYPE}};        # socks5, socks4, http
+    local_ip   = "127.0.0.1";
+    local_port = 12345;       /* hard‑coded, used by iptables rules */
+
+    ip   = "{{PROXY_HOST}}";  /* remote proxy host (string) */
+    port = {{PROXY_PORT}};    /* remote proxy port (integer) */
+
+    /* The type must be a *string*. Wrap the placeholder in quotes. */
+    type = "{{PROXY_TYPE}}";  /* socks5, socks4, http */
 }

@@ -11,8 +11,17 @@ IFS=$'\n\t'
 # -----------------------------------------------------------------
 # Logging helpers (timestamped, to stdout / stderr)
 # -----------------------------------------------------------------
-log_info()  { printf '[%s] INFO: %s\n' "$(date +%T)" "$*" ; }
-log_err()   { printf '[%s] ERROR: %s\n' "$(date +%T)" "$*" >&2 ; }
+log_info() { printf '[%s] INFO: %s\n' "$(date +%T)" "$*" ; }
+log_err()  { printf '[%s] ERROR: %s\n' "$(date +%T)" "$*" >&2 ; }
+
+# -----------------------------------------------------------------
+# Verify usage
+# -----------------------------------------------------------------
+if [[ $# -ne 1 ]] || [[ "$1" != "enable" && "$1" != "disable" ]]; then
+    log_err "Usage: $0 enable|disable"
+    exit 1
+fi
+ACTION=$1
 
 # -----------------------------------------------------------------
 # Verify required environment variables (same list as entrypoint)
@@ -30,7 +39,7 @@ for var in "${required_env_vars[@]}"; do
 done
 
 # -----------------------------------------------------------------
-# Constants (must stay in sync with entrypoint & redsocks.conf.template)
+# Constants – keep in sync with the entrypoint
 # -----------------------------------------------------------------
 REDIR_CHAIN="REDSOCKS"
 LOCAL_PORT=12345               # must match redsocks.conf
@@ -71,7 +80,7 @@ restart_redsocks() {
         if kill -0 "$oldpid" 2>/dev/null; then
             log_info "Stopping existing redsocks (PID $oldpid) ..."
             kill "$oldpid"
-            # give it up to 5 s to exit cleanly
+            # Give it up to 5 s to exit cleanly
             for i in {1..50}; do
                 kill -0 "$oldpid" 2>/dev/null || break
                 sleep 0.1
@@ -112,7 +121,8 @@ restart_redsocks() {
         exit 1
     fi
 
-    # store the new pid for the entrypoint’s “wait” logic
+    # store the new pid for the entrypoint (the entrypoint does *not* wait on it,
+    # but the file is useful for debugging)
     echo "$recorded" > "$RUNNING_PIDFILE"
     log_info "redsocks (re)started, PID $recorded."
 }
@@ -161,7 +171,7 @@ disable() {
 # -----------------------------------------------------------------
 # Dispatch
 # -----------------------------------------------------------------
-if [[ "$1" == "enable" ]]; then
+if [[ "$ACTION" == "enable" ]]; then
     enable
 else
     disable

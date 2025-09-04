@@ -8,6 +8,7 @@
 #  The script is deliberately defensive – any problem aborts the
 #  container with a clear error message.
 #=====================================================================
+
 set -euo pipefail
 IFS=$'\n\t'   # defensive
 
@@ -54,13 +55,11 @@ render_config() {
     fi
 
     log_info "Rendering redsocks configuration from ${template} ..."
-    # Use a single `sed` call – no need for a pipe
     sed -e "s|{{PROXY_HOST}}|${REDSOCKS_PROXY_HOST}|g" \
         -e "s|{{PROXY_PORT}}|${REDSOCKS_PROXY_PORT}|g" \
         -e "s|{{PROXY_TYPE}}|${REDSOCKS_PROXY_TYPE}|g" \
         "${template}" > "${target}"
 
-    # Verify the file was created and is not empty
     if [[ ! -s "${target}" ]]; then
         log_err "Failed to create a non‑empty ${target}."
         exit 1
@@ -85,18 +84,18 @@ install_charles_cert() {
     fi
 }
 
-
 # -----------------------------------------------------------------
-# Start redsocks **in the background**, keep its PID, and verify it.
+# Start redsocks **in the background**, keep its PID (as a shell variable),
+# and verify it.
 # -----------------------------------------------------------------
 start_redsocks() {
     local cfg="/etc/redsocks.conf"
     local pidfile="/var/run/redsocks.pid"
-    local listen_port=12345   # default, change if you ever make it configurable
+    local listen_port=12345   # must stay in sync with toggle‑redsocks.sh
 
     log_info "Launching redsocks …"
     redsocks -c "$cfg" -p "$pidfile" &
-    local redsocks_pid=$!
+    REDSOCKS_PID=$!   # child PID we will later *not* wait for (see below)
 
     # ---- wait for the PID file -------------------------------------------------
     for i in {1..20}; do   # up to 2 s
@@ -105,7 +104,7 @@ start_redsocks() {
     done
     if [[ ! -s "$pidfile" ]]; then
         log_err "redsocks never wrote its PID file – aborting."
-        kill "$redsocks_pid" 2>/dev/null || true
+        kill "$REDSOCKS_PID" 2>/dev/null || true
         exit 1
     fi
 
@@ -114,7 +113,7 @@ start_redsocks() {
     recorded=$(<"$pidfile")
     if ! kill -0 "$recorded" 2>/dev/null; then
         log_err "PID file contains a dead PID ($recorded) – aborting."
-        kill "$redsocks_pid" 2>/dev/null || true
+        kill "$REDSOCKS_PID" 2>/dev/null || true
         exit 1
     fi
 
@@ -125,7 +124,7 @@ start_redsocks() {
         exit 1
     fi
 
-    # expose the PID for later `wait`
+    # Keep a copy for the toggle script (it only needs the number, not the child‑relationship)
     echo "$recorded" > /tmp/redsocks.running.pid
     log_info "redsocks started successfully (PID $recorded)."
 }
@@ -138,23 +137,26 @@ install_charles_cert
 start_redsocks
 
 log_info "redsocks ready – forwarding is DISABLED."
-log_info "Run 'toggle-redsocks.sh enable' to start redirection."
+log_info "Run 'toggle‑redsocks.sh enable' to start redirection."
 
 # -----------------------------------------------------------------
 # Run the user‑provided command *while* redsocks stays alive.
-# When the command finishes we wait for redsocks and return its exit code.
+# When no command is given we simply block forever (sleep infinity).
+# If a command is supplied we run it, return its exit status,
+# and **do not** wait for the redsocks child – the child may have been
+# replaced by toggle‑redsocks.sh and is no longer a child of this shell.
 # -----------------------------------------------------------------
 if [[ $# -eq 0 ]]; then
     log_info "No command supplied – sleeping forever (Ctrl‑C to stop)."
-    # `wait` will keep the script alive and will return redsocks’ status
-    wait "$(cat /tmp/redsocks.running.pid)" || :
+    # `sleep infinity` is available in GNU coreutils (the usual Alpine/Debian base).
+    # It blocks the PID‑1 process so the container stays alive.
+    exec sleep infinity
 else
     log_info "Executing user command: $*"
     "$@"
     user_exit=$?
-    log_info "User command exited with status $user_exit – now waiting for redsocks."
-    # `wait` returns the exit status of redsocks (or 0 if it already died)
-    wait "$(cat /tmp/redsocks.running.pid)" || redsocks_exit=$?
-    # If redsocks died with a non‑zero status, prefer that; otherwise use the user command’s code
-    exit ${redsocks_exit:-$user_exit}
+    log_info "User command exited with status $user_exit."
+    # We deliberately **do not** wait for redsocks here – it may have been
+    # restarted by the toggle script and is not a child of this process.
+    exit $user_exit
 fi

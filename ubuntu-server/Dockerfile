@@ -1,7 +1,8 @@
+# https://hub.docker.com/_/ubuntu
 #From ubuntu:jammy
-FROM ubuntu:noble-20250714
+FROM ubuntu:noble-20250805
 LABEL maintainer="brian@wildsong.biz"
-ENV REFRESHED_AT=2025-08-01
+ENV REFRESHED_AT=2025-09-01
 
 ENV RELEASE=noble
 #ENV RELEASE=jammy
@@ -10,7 +11,7 @@ ENV RELEASE=noble
 
 RUN apt-get update && apt-get -y install apt-utils locales
 
-# Set up the locale. 
+# Set up the locale.
 RUN locale-gen en_US.UTF-8
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
 
@@ -24,6 +25,34 @@ RUN ln -s /etc/alternatives/python /usr/bin/python &&\
     ln -s /usr/bin/python3 /etc/alternatives/python
 
 #RUN pip install --upgrade pip && pip install requests
+
+
+# ---- Install everything we need --------------------------------
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        redsocks iptables ca-certificates curl nano gnupg
+#    rm -rf /var/lib/apt/lists/*
+
+# ---- Add the helper scripts & template -------------------------
+COPY redsocks-entrypoint.sh   /usr/local/bin/redsocks-entrypoint.sh
+COPY toggle-redsocks.sh       /usr/local/bin/toggle-redsocks.sh
+COPY redsocks.conf.template   /etc/redsocks.conf.template
+
+# ---- Permissions ------------------------------------------------
+RUN chmod +x /usr/local/bin/redsocks-entrypoint.sh \
+    && chmod +x /usr/local/bin/toggle-redsocks.sh
+
+# ---- Default environment variables -------------------------------
+# These can be overridden at `docker run -e …`
+ENV REDSOCKS_PROXY_HOST=host.docker.internal
+ENV REDSOCKS_PROXY_PORT=1080
+ENV REDSOCKS_PROXY_TYPE=socks5
+# socks4 / socks5 / http
+
+# ---- Keep the original entrypoint behaviour --------------------
+ENTRYPOINT ["/usr/local/bin/redsocks-entrypoint.sh"]
+# No CMD – the container will run whatever you pass (`bash`, `myapp`, …)
 
 # This will make the system work better and eliminate warnings from the temporal store checks
 COPY arcgis.conf /etc/sysctl.d/

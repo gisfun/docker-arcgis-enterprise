@@ -1,0 +1,18 @@
+base {
+    log_info = on;
+    log = "stderr";
+    daemon = off;
+    redirector = iptables;
+}
+
+/* -------------------------------------------------------------
+   Listen locally – redsocks will accept connections on this
+   address/port and forward them to the remote proxy.
+   ------------------------------------------------------------- */
+redsocks {
+    local_ip = "127.0.0.1";
+    local_port = 12345;           # <- hard‑coded, used by iptables rules
+    ip = "{{PROXY_HOST}}";
+    port = {{PROXY_PORT}};
+    type = {{PROXY_TYPE}};        # socks5, socks4, http
+}

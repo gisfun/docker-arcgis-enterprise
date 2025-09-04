@@ -40,7 +40,12 @@ sleep 2
 # --------------------------------------------------------------
 docker exec demo curl -k https://www.google.com > /dev/null
 echo "Check Charles UI – you should see the decrypted Google request."
-
+docker exec demo \
+  curl -k -s -X POST \
+       -H "Content-Type: application/json" \
+       -d '{"msg":"hello"}' \
+       https://postman-echo.com/post
+echo "Check Charles UI – you should see the decrypted Postman request."
 
 # prompts
 

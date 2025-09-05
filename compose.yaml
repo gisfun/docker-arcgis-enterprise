@@ -22,6 +22,14 @@ volumes:
   pgadmin_data:
     name: arcgis_pgadmin_data
 
+networks:
+  mynetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.0.0/24
+          gateway: 172.31.0.1
+
 services:
   server:
     image: arcgis-server
@@ -30,6 +38,11 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_TIME
+    container_name: ag-server
+    networks:
+      mynetwork:
+        ipv4_address: 172.31.0.10
+        mac_address: "02:42:ac:14:00:0a" # Note: MAC addresses should be within the Docker-assigned range for bridge networks
     hostname: ${GISSERVER}
     build: 
       context: ./server
@@ -64,6 +77,11 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_TIME
+    container_name: ag-portal
+    networks:
+      mynetwork:
+        ipv4_address: 172.31.0.11
+        mac_address: "02:42:ac:14:00:0b"
     hostname: ${PORTAL}
     build:
       context: ./portal
@@ -100,6 +118,11 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_TIME
+    container_name: ag-datastore
+    networks:
+      mynetwork:
+        ipv4_address: 172.31.0.12
+        mac_address: "02:42:ac:14:00:0c"
     hostname: ${DATASTORE}
     build: 
       context: ./datastore

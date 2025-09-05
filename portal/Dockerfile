@@ -1,4 +1,5 @@
-FROM ubuntu-server:latest
+#FROM ubuntu-server:latest
+FROM ubuntu-server:local
 LABEL maintainer="brian@wildsong.biz"
 ENV REFRESHED_AT=2025-08-01
 

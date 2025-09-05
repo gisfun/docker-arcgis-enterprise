@@ -5,7 +5,7 @@ ENV REFRESHED_AT=2025-08-01
 EXPOSE 2443 
 # If you are not using a Docker network to connect containers
 # you might want to expose these ports, too.
-# EXPOSE 9876 29080 29081 9220 9320
+EXPOSE 9876 29080 29081 9220 9320
 
 # Change owner so that arcgis can rm later.
 RUN chown -R arcgis:arcgis ${HOME}

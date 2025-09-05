@@ -25,6 +25,11 @@ volumes:
 services:
   server:
     image: arcgis-server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
     hostname: ${GISSERVER}
     build: 
       context: ./server
@@ -41,6 +46,8 @@ services:
       - ./Installers/ArcGISServer:/app/Installer:ro
       - ./Licenses/server.prvc:/app/server.prvc:ro
       - ./configurebasedeployment.properties:/app/configurebasedeployment.properties:rw
+      - "./shared/server:/shared:rw"
+      - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
       - server_home:/home/arcgis:rw
       - server_data:/srv/directories:rw
 #      - server_config:/home/arcgis/server/usr/config-store
@@ -52,6 +59,11 @@ services:
 
   portal:
     image: arcgis-portal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
     hostname: ${PORTAL}
     build:
       context: ./portal
@@ -68,6 +80,8 @@ services:
     volumes:
       - ./Installers/PortalForArcGIS:/app/Installer:ro
       - ./Licenses/portal.json:/app/portal_license.json:ro
+      - "./shared/portal:/shared:rw"
+      - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
       - portal_home:/home/arcgis:rw
       - portal_data:/home/arcgis/content:rw
      #- portal_data:/home/arcgis/portal/usr/arcgisportal:rw
@@ -75,12 +89,17 @@ services:
       - server
       - datastore
     # Uncomment the next three lines to work in a shell environment for debugging.
-    entrypoint: /bin/bash
-    stdin_open: true
-    tty: true
+#    entrypoint: /bin/bash
+#    stdin_open: true
+#    tty: true
 
   datastore:
     image: arcgis-datastore
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
     hostname: ${DATASTORE}
     build: 
       context: ./datastore
@@ -96,6 +115,7 @@ services:
       - "9876:9876"
     volumes:
       - ./Installers/DataStore:/app/Installer:ro
+      - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
       - datastore_home:/home/arcgis:rw
 # where does this belong
 #      - datastore_data:/home/arcgis/?????:rw
@@ -108,6 +128,8 @@ services:
 
   postgres:
     image: postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       context: .
       dockerfile: Dockerfile.postgres
@@ -123,6 +145,8 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8213:80"
     volumes:

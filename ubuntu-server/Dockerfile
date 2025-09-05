@@ -29,8 +29,7 @@ RUN ln -s /etc/alternatives/python /usr/bin/python &&\
 
 # ---- Install everything we need --------------------------------
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
         redsocks iptables ca-certificates curl nano gnupg
 #    rm -rf /var/lib/apt/lists/*
 
@@ -51,7 +50,8 @@ ENV REDSOCKS_PROXY_TYPE=socks5
 # socks4 / socks5 / http
 
 # ---- Keep the original entrypoint behaviour --------------------
-ENTRYPOINT ["/usr/local/bin/redsocks-entrypoint.sh"]
+# below is not needed if toggle-redsocks can work without it
+#ENTRYPOINT ["/usr/local/bin/redsocks-entrypoint.sh"]
 # No CMD – the container will run whatever you pass (`bash`, `myapp`, …)
 
 # This will make the system work better and eliminate warnings from the temporal store checks

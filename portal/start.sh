@@ -15,7 +15,7 @@ PROPERTIES=".ESRI.properties.${HOSTNAME}.${ESRI_VERSION}"
 # TODO find the current logfile instead
 # amd remove only old logs
 LOGDIR="/home/arcgis/portal/usr/arcgisportal/logs"
-rm -rf $LOGDIR/PORTAL.LOCAL/portal/*.l??
+rm -rf $LOGDIR/${HOSTNAME}/portal/*.l??
 
 # Well, maybe if this file is here then it's installed already?
 SCRIPT="/home/arcgis/portal/framework/etc/agsportal.sh"
@@ -51,7 +51,7 @@ createportal.sh -fn Site -ln Admin \
 		-u ${AGP_USERNAME} -p ${AGP_PASSWORD} \
 		-e ${ADMIN_EMAIL} \
 		-d ${PORTAL_CONTENT} \
-		-lf /app/portal_license.json
+		-lf /app/licenses/portal.json
 
 CONFIG_STORE="/home/arcgis/portal/framework/etc/config-store-connection.json"
 if [ -f $CONFIG_STORE} ]; then
@@ -62,4 +62,4 @@ fi
 
 echo "Try reaching me at ${PORTAL_URL}"
 
-tail -f ${LOGDIR}/PORTAL.LOCAL/portal/*.log
+tail -f ${LOGDIR}/${HOSTNAME}/portal/*.log

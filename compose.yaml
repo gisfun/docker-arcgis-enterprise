@@ -52,12 +52,14 @@ services:
       - ESRI_VERSION=${ESRI_VERSION}
       - AGS_USERNAME=${USERNAME}
       - AGS_PASSWORD=${PASSWORD}
+      - KEYCODES_PATH=/home/arcgis/server/framework/runtime/.wine/drive_c/Program Files/ESRI/License${ESRI_VERSION}/sysgen/keycodes
     ports:
       - "6080:6080"
       - "6443:6443"
     volumes:
       - ./Installers/ArcGISServer:/app/Installer:ro
-      - ./Licenses/server.prvc:/app/server.prvc:ro
+      - ./Licenses:/app/licenses
+     #- ./Licenses/server.prvc:/app/server.prvc:ro
       - ./configurebasedeployment.properties:/app/configurebasedeployment.properties:rw
       - "./shared/server:/shared:rw"
       - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
@@ -97,7 +99,8 @@ services:
       - "7443:7443"
     volumes:
       - ./Installers/PortalForArcGIS:/app/Installer:ro
-      - ./Licenses/portal.json:/app/portal_license.json:ro
+      - ./Licenses:/app/licenses
+     #- ./Licenses/portal.json:/app/portal_license.json:ro
       - "./shared/portal:/shared:rw"
       - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
       - portal_home:/home/arcgis:rw

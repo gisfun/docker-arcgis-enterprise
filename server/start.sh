@@ -37,7 +37,7 @@ if authorizeSoftware -s | grep arcsdeserver; then
   authorizeSoftware -s | tail -6
 else
   echo "Authorizing."
-  authorizeSoftware -f /app/server.prvc
+  authorizeSoftware -f /app/licences/server.prvc
 fi
 echo ""
 

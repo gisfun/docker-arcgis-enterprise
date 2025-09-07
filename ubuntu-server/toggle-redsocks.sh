@@ -80,7 +80,7 @@ restart_redsocks() {
         if kill -0 "$oldpid" 2>/dev/null; then
             log_info "Stopping existing redsocks (PID $oldpid) ..."
             kill "$oldpid"
-            # Give it up to 5 s to exit cleanly
+            # Give it up to 5s to exit cleanly
             for i in {1..50}; do
                 kill -0 "$oldpid" 2>/dev/null || break
                 sleep 0.1
@@ -97,9 +97,9 @@ restart_redsocks() {
     redsocks -c "$CONF_TARGET" -p "$REDSPIDFILE" &
     redsocks_pid=$!
 
-    # wait for the pidfile to appear (max 2 s)
-    for i in {1..20}; do
-        [[ -s "$REDSPIDFILE" ]] && break
+    # wait for redsocks to start (5s)
+    for i in {1..50}; do
+        # [[ -s "$REDSPIDFILE" ]] && break
         sleep 0.1
     done
     if [[ ! -s "$REDSPIDFILE" ]]; then

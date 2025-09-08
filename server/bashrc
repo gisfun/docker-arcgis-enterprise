@@ -2,5 +2,15 @@
 export PS1="ArcGIS Server$ "
 
 # Add the Server binaries to the PATH
-PATH=$PATH:$HOME/server:$HOME/server/tools:$HOME/server/tools/configurebasedeployment
+#PATH=$PATH:$HOME/server:$HOME/server/tools:$HOME/server/tools/configurebasedeployment
+
+SERVER_TOOLS=$HOME/server/tools
+PATH=$PATH:$HOME/server:$SERVER_TOOLS
+#PATH="${PATH}:$(find $HOME/server/tools -type d -printf ':%p')"
+
+for d in "$SERVER_TOOLS"/* ; do
+    if [ -d "$d" ]; then
+        PATH="$PATH:$d"
+    fi
+done
 export PATH

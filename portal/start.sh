@@ -32,6 +32,9 @@ if [ -f ${SCRIPT} ]; then
   ${SCRIPT} restart
 fi
 
+# need to do this again for portaldiag/createportal.sh .. not sure why
+source /app/bashrc
+
 PORTAL_URL="https://${HOSTNAME}:7443/arcgis/home/"
 echo -n "Waiting for Portal to start.. "
 sleep 10

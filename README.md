@@ -15,6 +15,28 @@ and 64GB of RAM and a 1TB of NVME storage. That probably helps. :-)
 * ~combined server and portal into single container~ (not recommended)
 * updated to Ubuntu 24.04, Postgres 16
 
+### References/Links
+
+* https://enterprise.arcgis.com/en/server/latest/install/linux/silently-install-arcgis-server.htm
+* https://enterprise.arcgis.com/en/portal/latest/install/linux/silently-installing-portal-for-arcgis.htm
+* https://enterprise.arcgis.com/en/server/latest/deploy/linux/using-a-reverse-proxy-server-with-arcgis-server.htm
+* https://enterprise.arcgis.com/en/portal/latest/administer/linux/using-a-reverse-proxy-server-with-portal-for-arcgis.htm
+* https://community.esri.com/t5/arcgis-enterprise-questions/arcgis-11-3-web-hosting-under-nginx-are-we/td-p/1603576
+* https://portal.local:7443/arcgis/portaladmin/system/properties
+* https://portal.local:7443/arcgis/sharing/rest/generateToken
+
+### Manual setup (pending config by properties file)
+
+* https://server.local:6443/arcgis/manager/
+* https://portal.local:7443/arcgis/home/createadmin.html
+
+### Server/Portal tools
+
+Tools added to .bashrc and accessible via docker exec
+
+`docker exec -it ag-server bash --login -c "serverdiag"`
+`docker exec -it ag-portal bash --login -c "portaldiag"`
+
 ## Status
 
 * Server : working

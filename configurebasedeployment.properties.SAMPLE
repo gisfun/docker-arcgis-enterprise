@@ -61,3 +61,4 @@ WEBGIS_SERVER_WEBADAPTOR_URL =
 # The path to the Portal license file
 PORTAL_LICENSE_FILE =
 # The id of the user type for the Initial Administrator
+PORTAL_USER_TYPE_ID =

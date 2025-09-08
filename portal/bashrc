@@ -5,13 +5,22 @@ export PS1="Portal$ "
 # tools/ -- bad idea.. whatever.. there are more tools
 # these are just the ones I added today.
 PATH=$PATH:$HOME/portal:\
-$HOME/portal/framework/etc:\
-$HOME/portal/tools/accountmanagement:\
-$HOME/portal/tools/createportal:\
-$HOME/portal/tools/operationalhealth:\
-$HOME/portal/tools/importlicense:\
-$HOME/portal/tools/indexer:\
-$HOME/portal/tools/portaldiag:\
-$HOME/portal/tools/webgisdr
+$HOME/portal/framework/etc
+# $HOME/portal/tools/accountmanagement:\
+# $HOME/portal/tools/createportal:\
+# $HOME/portal/tools/operationalhealth:\
+# $HOME/portal/tools/importlicense:\
+# $HOME/portal/tools/indexer:\
+# $HOME/portal/tools/portaldiag:\
+# $HOME/portal/tools/webgisdr
 
+PORTAL_TOOLS=$HOME/portal/tools
+PATH=$PATH:$PORTAL_TOOLS
+#PATH="${PATH}:$(find $HOME/server/tools -type d -printf ':%p')"
+
+for d in "$PORTAL_TOOLS"/* ; do
+    if [ -d "$d" ]; then
+        PATH="$PATH:$d"
+    fi
+done
 export PATH

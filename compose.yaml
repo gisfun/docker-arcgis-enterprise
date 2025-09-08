@@ -21,6 +21,10 @@ volumes:
     name: arcgis_postgres_data
   pgadmin_data:
     name: arcgis_pgadmin_data
+  test_home:
+    name: arcgis_test_home
+  test_data:
+    name: arcgis_test_data
 
 networks:
   mynetwork:
@@ -156,6 +160,8 @@ services:
     image: postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - mynetwork
     build:
       context: .
       dockerfile: Dockerfile.postgres
@@ -173,6 +179,8 @@ services:
     image: dpage/pgadmin4:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - mynetwork
     ports:
       - "8213:80"
     volumes:
@@ -183,3 +191,45 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USER}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_DISABLE_POSTFIX: 1
+
+  test:
+    image: arcgis-test
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cap_add:
+      - NET_ADMIN
+      - SYS_TIME
+    container_name: ag-test
+    networks:
+      - mynetwork
+    #     ipv4_address: 172.31.0.10
+    #     mac_address: "02:42:ac:14:00:0a" # Note: MAC addresses should be within the Docker-assigned range for bridge networks
+    hostname: test.local
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    env_file: ./.env
+    environment:
+      - ESRI_VERSION=${ESRI_VERSION}
+      - AGS_USERNAME=${USERNAME}
+      - AGS_PASSWORD=${PASSWORD}
+      - KEYCODES_PATH=/home/arcgis/arcgis/notebookserver/framework/runtime/.esri/License${ESRI_VERSION}/sysgen/keycodes
+    ports:
+      - "11443:11443"
+    volumes:
+      - ./Installers:/app/Installers:ro
+      - ./Licenses:/app/licenses
+     #- ./Licenses/server.prvc:/app/server.prvc:ro
+      - ./configurebasedeployment.properties:/app/configurebasedeployment.properties:rw
+      - "./shared:/shared:rw"
+      - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
+      - test_home:/home/arcgis:rw
+      # used by docker
+      - test_data:/data:rw
+     # - server_data:/srv/directories:rw
+#      - server_config:/home/arcgis/server/usr/config-store
+#      - server_logs:/home/arcgis/server/usr/logs
+    # Uncomment the next three lines to work in a shell environment for debugging. (See exec_server)
+    # entrypoint: /bin/bash
+    # stdin_open: true
+    # tty: true

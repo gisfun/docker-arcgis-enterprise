@@ -62,12 +62,14 @@ RUN apt-get -y install libice6 libsm6 libxtst6 libxrender1 dos2unix
 
 # Create the user/group who will run ArcGIS services
 # I set them to my own UID/GID so that the VOLUMES I create will be read/write
-RUN groupadd -g 1001 arcgis && useradd -m -r arcgis -g arcgis -u 1001
+RUN groupadd -g 1050 arcgis && useradd -m -r arcgis -g arcgis -u 1050
 ENV HOME=/home/arcgis
 
 RUN chown arcgis.arcgis /home/arcgis
 WORKDIR /home/arcgis
-VOLUME /home/arcgis
+
+# this causes issues with Notebook Server under WSL2
+# VOLUME /home/arcgis
 
 # Note the user is still set to root here, we want this so that
 # containers that pull from this one still have root when they start.

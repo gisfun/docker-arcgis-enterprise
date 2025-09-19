@@ -10,8 +10,12 @@ RUN echo \
   $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
   tee /etc/apt/sources.list.d/docker.list > /dev/nu
 RUN apt-get update -y
-RUN apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+RUN apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin sudo
 RUN usermod -aG docker arcgis
+RUN usermod -aG sudo arcgis
+
+RUN echo "arcgis ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/arcgis \
+    && chmod 0440 /etc/sudoers.d/arcgis
 
 # Port information: https://enterprise.arcgis.com/en/notebook/latest/install/linux/install-arcgis-notebook-server.htm
 EXPOSE 11443

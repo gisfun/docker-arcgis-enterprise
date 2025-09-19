@@ -194,10 +194,13 @@ services:
 
   test:
     image: arcgis-test
+    # cgroup: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "${PORTAL}:host-gateway"
     cap_add:
       - NET_ADMIN
+      # - SYS_ADMIN
       - SYS_TIME
     container_name: ag-test
     networks:
@@ -223,9 +226,15 @@ services:
       - ./configurebasedeployment.properties:/app/configurebasedeployment.properties:rw
       - "./shared:/shared:rw"
       - "./ubuntu-server/charles.pem:/tmp/charles.pem:ro"
-      - test_home:/home/arcgis:rw
-      # used by docker
+      # important: this affects Docker-in-Docker mounting, paths under named volumes cannot be used directly
+      # /home/arcgis -> /var/lib/docker/volumes/arcgis_test_home/_data
+      # - test_home:/home/arcgis:rw
+      # mounting actual path from WSL host (for DinD)
+      - /home/arcgis:/home/arcgis:rw
       - test_data:/data:rw
+      #- /sys/fs/cgroup:/sys/fs/cgroup:rw
+      # important: enable below if using WSL2
+      - /var/run/docker.sock:/var/run/docker.sock
      # - server_data:/srv/directories:rw
 #      - server_config:/home/arcgis/server/usr/config-store
 #      - server_logs:/home/arcgis/server/usr/logs

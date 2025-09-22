@@ -29,6 +29,8 @@ volumes:
 networks:
   mynetwork:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "0.0.0.0"
     ipam:
       config:
         - subnet: 172.31.0.0/24
@@ -197,17 +199,18 @@ services:
     # cgroup: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
-      - "${PORTAL}:host-gateway"
+      # - "${PORTAL}:host-gateway"
     cap_add:
       - NET_ADMIN
       # - SYS_ADMIN
       - SYS_TIME
     container_name: ag-test
-    networks:
-      - mynetwork
+    network_mode: "host"
+    #networks:
+    #  - mynetwork
     #     ipv4_address: 172.31.0.10
     #     mac_address: "02:42:ac:14:00:0a" # Note: MAC addresses should be within the Docker-assigned range for bridge networks
-    hostname: test.local
+    #hostname: test.local
     build:
       context: ./test
       dockerfile: Dockerfile
@@ -219,6 +222,7 @@ services:
       - KEYCODES_PATH=/home/arcgis/arcgis/notebookserver/framework/runtime/.esri/License${ESRI_VERSION}/sysgen/keycodes
     ports:
       - "11443:11443"
+      #- "10.42.0.13:30001-30010:30001-30010"
     volumes:
       - ./Installers:/app/Installers:ro
       - ./Licenses:/app/licenses

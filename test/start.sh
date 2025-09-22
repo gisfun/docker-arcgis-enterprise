@@ -19,7 +19,12 @@ else
   /app/Installers/NotebookServer_Linux/Setup -m silent -d /home --verbose -l yes -a /app/licenses/keycodes.ecp
 fi
 
+mkdir -p /home/arcgis/arcgisnotebookserver/directories
 # 1050:100
 sudo chown -R arcgis:users /home/arcgis/arcgisnotebookserver/directories
 
+sudo nginx -g 'daemon off;' & # Start NGINX in the background
+
+# allow globstar expansion
+shopt -s globstar
 tail -f /var/log/*.log /home/arcgis/arcgisnotebookserver/logs/**/*.log
